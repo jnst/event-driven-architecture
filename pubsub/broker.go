@@ -1,6 +1,7 @@
 package pubsub
 
 type Broker struct {
-	TopicArn string
-	Endpoint string
+	TopicArn        string
+	QueueUrl        string
+	SubscriptionArn string
 }
