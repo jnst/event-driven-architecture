@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sns"
-	"github.com/jnst/event-sourcing/pubsub"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 func main() {
@@ -24,41 +24,47 @@ func main() {
 		panic(err)
 	}
 
-	svc := sns.New(sess)
+	svc := sqs.New(sess)
+	queueUrl := Prepare(svc)
 
-	topicArn, err := Prepare(svc)
-	if err != nil {
-		panic(err)
-	}
-
-	s := pubsub.NewSubscriber(svc)
-	_, err = s.Subscribe(topicArn)
-	if err != nil {
-		panic(err)
-	}
-
-	p := pubsub.NewPublisher(svc)
-	_, err = p.Publish(topicArn, "test message")
-	if err != nil {
-		panic(err)
-	}
-}
-
-func Prepare(svc *sns.SNS) (string, error) {
-	output, err := svc.CreateTopic(&sns.CreateTopicInput{
-		Name: aws.String("test"),
-		//Attributes: map[string]*string{
-		//	"": aws.String(""),
-		//},
+	output1, err := svc.SendMessage(&sqs.SendMessageInput{
+		MessageBody: aws.String("Hello, World"),
+		QueueUrl:    aws.String(queueUrl),
 	})
-	if err != nil { // FYI: if already topic exists, it's not occurs error.
-		return "", err
+	if err != nil {
+		panic(err)
 	}
+	fmt.Printf("send: %+v\n", output1)
 
-	return *output.TopicArn, nil
+	output2, err := svc.ReceiveMessage(&sqs.ReceiveMessageInput{QueueUrl: aws.String(queueUrl)})
+	fmt.Printf("receive: %+v\n", output2)
+
+	if output2 != nil {
+		for _, message := range output2.Messages {
+			_, err := svc.DeleteMessage(&sqs.DeleteMessageInput{
+				QueueUrl:      aws.String(queueUrl),
+				ReceiptHandle: message.ReceiptHandle,
+			})
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("deleted.")
+		}
+	}
 }
 
-func Destroy(svc *sns.SNS, topicArn string) error {
-	_, err := svc.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(topicArn)})
-	return err
+func Prepare(svc *sqs.SQS) string {
+	output, err := svc.CreateQueue(&sqs.CreateQueueInput{QueueName: aws.String("es-test")})
+	if err != nil {
+		panic(err)
+	}
+
+	return *output.QueueUrl
+}
+
+func Destroy(svc *sqs.SQS, queueUrl string) {
+	_, err := svc.DeleteQueue(&sqs.DeleteQueueInput{QueueUrl: aws.String(queueUrl)})
+	if err != nil {
+		panic(err)
+	}
 }
