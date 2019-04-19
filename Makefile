@@ -4,5 +4,5 @@ start:
 	go run *.go
 
 format:
-	gofmt -w *.go
-	goimports -w *.go
+	gofmt -w *.go **/*.go
+	goimports -w *.go **/*.go

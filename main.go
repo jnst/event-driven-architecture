@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/jnst/event-sourcing/pubsub"
 )
 
 func main() {
@@ -31,17 +31,17 @@ func main() {
 		panic(err)
 	}
 
-	output, err := svc.Publish(&sns.PublishInput{
-		Message:  aws.String("test"),
-		TopicArn: aws.String(topicArn),
-	})
+	s := pubsub.NewSubscriber(svc)
+	_, err = s.Subscribe(topicArn)
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Println(output)
-
-	//err = Destroy(svc, topicArn)
-	//if err != nil {
-	//	panic(err)
-	//}
+	p := pubsub.NewPublisher(svc)
+	_, err = p.Publish(topicArn, "test message")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Prepare(svc *sns.SNS) (string, error) {
