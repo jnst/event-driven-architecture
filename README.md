@@ -4,11 +4,11 @@
 
 ### Publisher
 
-TODO
+Publisher are responsible for messaging using Amazon SNS.
 
 ### Subscriber
 
-TODO
+Subscribers are responsible for polling for queuing.
 
 ### Butler
 
