@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/jnst/event-sourcing/pubsub"
 )
@@ -14,31 +16,18 @@ func main() {
 	}
 
 	butler := pubsub.NewButler(profile)
-	butler.Prepare("es-topic", "es-queue")
-	butler.Destroy()
+	broker := butler.Prepare("es-topic", "es-queue")
 
-	//output1, err := svc.SendMessage(&sqs.SendMessageInput{
-	//	MessageBody: aws.String("Hello, World"),
-	//	QueueUrl:    aws.String(queueUrl),
-	//})
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Printf("send: %+v\n", output1)
-	//
-	//output2, err := svc.ReceiveMessage(&sqs.ReceiveMessageInput{QueueUrl: aws.String(queueUrl)})
-	//fmt.Printf("receive: %+v\n", output2)
-	//
-	//if output2 != nil {
-	//	for _, message := range output2.Messages {
-	//		_, err := svc.DeleteMessage(&sqs.DeleteMessageInput{
-	//			QueueUrl:      aws.String(queueUrl),
-	//			ReceiptHandle: message.ReceiptHandle,
-	//		})
-	//		if err != nil {
-	//			panic(err)
-	//		}
-	//		fmt.Println("deleted.")
-	//	}
-	//}
+	//subscriber := pubsub.NewSubscriber(butler.Sqs)
+	//ctx := context.Background()
+	//go subscriber.Subscribe(ctx, broker.QueueUrl)
+
+	publisher := pubsub.NewPublisher(butler.Sns)
+	for i := 1; i < 10; i++ {
+		_, _ = publisher.Publish(broker.TopicArn, fmt.Sprintf("test-message-%d", i))
+		time.Sleep(5 * time.Second)
+	}
+
+	//ctx.Done()
+	//butler.Destroy()
 }

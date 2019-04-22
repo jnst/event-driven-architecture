@@ -38,7 +38,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Prepare queue:\n %+v\n", queueOutput)
+	fmt.Printf("Prepare queue:\n%+v\n", queueOutput)
 
 	queueAttrOutput, err := b.Sqs.GetQueueAttributes(&sqs.GetQueueAttributesInput{
 		AttributeNames: []*string{aws.String("All")},
@@ -47,8 +47,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil {
 		panic(err)
 	}
-	queueArn := queueAttrOutput.Attributes["QueueArn"]
-	fmt.Printf("Prepare queue-attributes:\n %+v\n", queueAttrOutput)
+	fmt.Printf("Prepare queue-attributes:\n%+v\n", queueAttrOutput)
 
 	// Pub/Sub
 	topicOutput, err := b.Sns.CreateTopic(&sns.CreateTopicInput{
@@ -57,17 +56,18 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil { // FYI: if already topic exists, it's not occurs error.
 		panic(err)
 	}
-	fmt.Printf("Prepare topic:\n %+v\n", topicOutput)
+	fmt.Printf("Prepare topic:\n%+v\n", topicOutput)
 
 	subOutput, err := b.Sns.Subscribe(&sns.SubscribeInput{
-		TopicArn: topicOutput.TopicArn,
-		Protocol: aws.String("sqs"),
-		Endpoint: queueArn,
+		Endpoint:              queueAttrOutput.Attributes["QueueArn"],
+		Protocol:              aws.String("sqs"),
+		ReturnSubscriptionArn: aws.Bool(true),
+		TopicArn:              topicOutput.TopicArn,
 	})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Prepare subscription:\n %+v\n", subOutput)
+	fmt.Printf("Prepare subscription:\n%+v\n", subOutput)
 
 	b.broker = Broker{
 		TopicArn:        *topicOutput.TopicArn,
