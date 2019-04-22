@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -18,9 +19,9 @@ func main() {
 	butler := pubsub.NewButler(profile)
 	broker := butler.Prepare("es-topic", "es-queue")
 
-	//subscriber := pubsub.NewSubscriber(butler.Sqs)
-	//ctx := context.Background()
-	//go subscriber.Subscribe(ctx, broker.QueueUrl)
+	subscriber := pubsub.NewSubscriber(butler.Sqs)
+	ctx := context.Background()
+	go subscriber.Subscribe(ctx, broker.QueueUrl)
 
 	publisher := pubsub.NewPublisher(butler.Sns)
 	for i := 1; i < 10; i++ {
@@ -28,6 +29,6 @@ func main() {
 		time.Sleep(5 * time.Second)
 	}
 
-	//ctx.Done()
-	//butler.Destroy()
+	ctx.Done()
+	butler.Destroy()
 }

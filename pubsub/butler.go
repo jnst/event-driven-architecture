@@ -1,6 +1,7 @@
 package pubsub
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -28,6 +29,25 @@ func NewButler(profile string) *Butler {
 		Sns: sns.New(sess),
 		Sqs: sqs.New(sess),
 	}
+}
+
+type PolicyDocument struct {
+	Version   string
+	Id        string
+	Statement []StatementEntry
+}
+
+type StatementEntry struct {
+	Sid       string
+	Effect    string
+	Principal string
+	Action    string
+	Resource  string
+	Condition Condition
+}
+
+type Condition struct {
+	ArnEquals map[string]string
 }
 
 func (b *Butler) Prepare(topicName, queueName string) Broker {
@@ -68,6 +88,37 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 		panic(err)
 	}
 	fmt.Printf("Prepare subscription:\n%+v\n", subOutput)
+
+	// Policy for SQS
+	policy := PolicyDocument{
+		Version: "2012-10-17",
+		Id:      "MyQueuePolicy",
+		Statement: []StatementEntry{
+			{
+				Sid:       "MySQSPolicy001",
+				Effect:    "Allow",
+				Principal: "*",
+				Action:    "sqs:SendMessage",
+				Resource:  *queueAttrOutput.Attributes["QueueArn"],
+				Condition: Condition{
+					ArnEquals: map[string]string{
+						"aws:SourceArn": *topicOutput.TopicArn,
+					},
+				},
+			},
+		},
+	}
+	buf, err := json.Marshal(&policy)
+	if err != nil {
+		panic(err)
+	}
+	_, err = b.Sqs.SetQueueAttributes(&sqs.SetQueueAttributesInput{
+		Attributes: map[string]*string{"Policy": aws.String(string(buf))},
+		QueueUrl:   queueOutput.QueueUrl,
+	})
+	if err != nil {
+		panic(err)
+	}
 
 	b.broker = Broker{
 		TopicArn:        *topicOutput.TopicArn,
