@@ -17,9 +17,11 @@ type Butler struct {
 	broker Broker
 }
 
-func NewButler(profile string) *Butler {
+func NewButlerWithProfile(profile string) *Butler {
 	creds := credentials.NewSharedCredentials("", profile)
-	cfg := aws.NewConfig().WithCredentials(creds).WithRegion("ap-northeast-1")
+	cfg := aws.NewConfig().
+		WithCredentials(creds).
+		WithRegion("ap-northeast-1")
 	sess, err := session.NewSession(cfg)
 	if err != nil {
 		panic(err)
@@ -28,6 +30,25 @@ func NewButler(profile string) *Butler {
 	return &Butler{
 		Sns: sns.New(sess),
 		Sqs: sqs.New(sess),
+	}
+}
+
+func NewButlerWithLocalstack() *Butler {
+	cfg := aws.NewConfig().WithRegion("ap-northeast-1")
+
+	snsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4575"))
+	if err != nil {
+		panic(err)
+	}
+
+	sqsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4576"))
+	if err != nil {
+		panic(err)
+	}
+
+	return &Butler{
+		Sns: sns.New(snsSess),
+		Sqs: sqs.New(sqsSess),
 	}
 }
 

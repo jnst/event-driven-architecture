@@ -3,20 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/jnst/event-sourcing/pubsub"
 )
 
 func main() {
-	const EnvKeyAwsProfile = "AWS_PROFILE"
-	profile, ok := os.LookupEnv(EnvKeyAwsProfile)
-	if !ok {
-		panic("missing env: " + EnvKeyAwsProfile)
-	}
+	//const EnvKeyAwsProfile = "AWS_PROFILE"
+	//profile, ok := os.LookupEnv(EnvKeyAwsProfile)
+	//if !ok {
+	//	panic("missing env: " + EnvKeyAwsProfile)
+	//}
+	//butler := pubsub.NewButlerWithProfile(profile)
 
-	butler := pubsub.NewButler(profile)
+	butler := pubsub.NewButlerWithLocalstack()
 	broker := butler.Prepare("es-topic", "es-queue")
 
 	subscriber := pubsub.NewSubscriber(butler.Sqs)
