@@ -111,6 +111,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	fmt.Printf("Prepare subscription:\n%+v\n", subOutput)
 
 	// Policy for SQS
+	// See https://docs.aws.amazon.com/ja_jp/sns/latest/dg/sns-sqs-as-subscriber.html#SendMessageToSQS.sqs.permissions
 	policy := PolicyDocument{
 		Version: "2012-10-17",
 		Id:      "MyQueuePolicy",
