@@ -152,7 +152,13 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 }
 
 func (b *Butler) Destroy() {
-	_, err := b.Sns.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(b.broker.TopicArn)})
+	_, err := b.Sns.Unsubscribe(&sns.UnsubscribeInput{SubscriptionArn: aws.String(b.broker.SubscriptionArn)})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Destroy subscription done.")
+
+	_, err = b.Sns.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(b.broker.TopicArn)})
 	if err != nil {
 		panic(err)
 	}
