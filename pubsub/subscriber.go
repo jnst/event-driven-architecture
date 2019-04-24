@@ -20,7 +20,7 @@ func NewSubscriber(svc *sqs.SQS) *Subscriber {
 }
 
 func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 
 	for {
@@ -33,9 +33,17 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Printf("received: %+v\n", output)
+			if len(output.Messages) == 0 {
+				fmt.Println("received: no message")
+			} else {
+				fmt.Printf("received: %+v\n", output)
+			}
 
 			for _, message := range output.Messages {
+
+				fmt.Println("processing: any application code")
+
+				// Messages received from the queue need to be deleted at the end of processing.
 				_, err = s.svc.DeleteMessage(&sqs.DeleteMessageInput{
 					QueueUrl:      aws.String(queueUrl),
 					ReceiptHandle: message.ReceiptHandle,
