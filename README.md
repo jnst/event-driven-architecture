@@ -1,4 +1,4 @@
-# event-sourcing
+# event-driven-architecture
 
 ## Concept
 
@@ -13,7 +13,7 @@ Subscribers are responsible for polling for queuing.
 ### Butler
 
 Butler does chores such as creation, destruction of SNS/SQS.  
-FYI: This has nothing to do with the concept of the Event sourcing architecture. 
+`FYI:` This has nothing to do with the concept of the Event driven architecture. 
 
 ## Setup
 

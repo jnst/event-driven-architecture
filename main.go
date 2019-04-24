@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jnst/event-sourcing/pubsub"
+	"github.com/jnst/event-driven-architecture/pubsub"
 )
 
 func main() {
