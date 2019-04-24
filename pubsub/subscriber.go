@@ -20,7 +20,7 @@ func NewSubscriber(svc *sqs.SQS) *Subscriber {
 }
 
 func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
-	ticker := time.NewTicker(2 * time.Second)
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {

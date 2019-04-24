@@ -21,7 +21,7 @@ func main() {
 
 	fmt.Println("========== Prepare done ==========")
 
-	// Subscriber polling topic every 2 second.
+	// Subscriber polling topic every second.
 	// In this case, you only receive messages by polling, but in a real application, processing is performed according to the business domain.
 	subscriber := pubsub.NewSubscriber(butler.Sqs)
 	ctx := context.Background()
