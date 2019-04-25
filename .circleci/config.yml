@@ -3,9 +3,27 @@ version: 2.1
 orbs:
   aws-ecr: circleci/aws-ecr@4.0.1
 
-workflows:
-  build_and_push_image:
-    jobs:
-      - aws-ecr/build_and_push_image:
+jobs:
+  build_and_push:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Choose docker image tag
+          command: |
+            tag=${CIRCLE_TAG:-$CIRCLE_SHA1}
+            echo $tag
+            echo "export IMAGE_TAG=$tag" >> $BASH_ENV
+      - aws-ecr/build-and-push-image:
           create-repo: true
-          repo: $AWS_ECR_ACCOUNT_URL/event-driven-architecture
+          repo: $CIRCLE_PROJECT_REPONAME
+          tag: $IMAGE_TAG
+
+workflows:
+  build_and_push:
+    jobs:
+      - build_and_push:
+          filters:
+            tags:
+                only: /^test-.+/
