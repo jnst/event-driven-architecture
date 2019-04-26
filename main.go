@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/jnst/event-driven-architecture/pubsub"
@@ -30,7 +32,18 @@ func main() {
 	// Publisher sends message to topic every 5 seconds.
 	publisher := pubsub.NewPublisher(butler.Sns)
 	for i := 1; i < 5; i++ {
-		_, _ = publisher.Publish(broker.TopicArn, fmt.Sprintf("test-message-%d", i))
+		userId := strconv.Itoa(i)
+		msg := pubsub.UserEvent{
+			UserId: userId,
+			Status: "user.created",
+			Time:   time.Now().Unix(),
+		}
+		b, err := json.Marshal(msg)
+		if err != nil {
+			panic(err)
+		}
+
+		_, _ = publisher.Publish(broker.TopicArn, string(b))
 		time.Sleep(5 * time.Second)
 	}
 

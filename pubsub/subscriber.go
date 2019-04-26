@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -41,7 +42,33 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 
 			for _, message := range output.Messages {
 
-				fmt.Println("processing: any application code")
+				fmt.Println("processing:")
+				body := MessageBody{}
+				err = json.Unmarshal([]byte(*message.Body), &body)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+				userEvent := UserEvent{}
+				err = json.Unmarshal([]byte(body.Message), &userEvent)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+
+				switch userEvent.Status {
+				case "user.created":
+					fmt.Println("  event: user.created!")
+					// write any processing code here
+				case "user.updated":
+					fmt.Println("  event: user.updated!")
+					// write any processing code here
+				case "user.deleted":
+					fmt.Println("  event: user.deleted!")
+					// write any processing code here
+				default:
+					fmt.Println("  event: unsupported event")
+				}
 
 				// Messages received from the queue need to be deleted at the end of processing.
 				_, err = s.svc.DeleteMessage(&sqs.DeleteMessageInput{
