@@ -21,6 +21,8 @@ func NewSubscriber(svc *sqs.SQS) *Subscriber {
 }
 
 func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
+	usecase := NewUsecase()
+
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
@@ -58,16 +60,13 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 
 				switch userEvent.Status {
 				case "user.created":
-					fmt.Println("  event: user.created!")
-					// write any processing code here
+					usecase.DoAnyProcess(userEvent.Status)
 				case "user.updated":
-					fmt.Println("  event: user.updated!")
-					// write any processing code here
+					usecase.DoAnyProcess(userEvent.Status)
 				case "user.deleted":
-					fmt.Println("  event: user.deleted!")
-					// write any processing code here
+					usecase.DoAnyProcess(userEvent.Status)
 				default:
-					fmt.Println("  event: unsupported event")
+					usecase.DoAnyProcess(userEvent.Status)
 				}
 
 				// Messages received from the queue need to be deleted at the end of processing.
