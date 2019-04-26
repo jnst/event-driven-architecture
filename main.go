@@ -24,7 +24,7 @@ func main() {
 	fmt.Println("========== Prepare done ==========")
 
 	// Subscriber polling topic every second.
-	// In this case, you only receive messages by polling, but in a real application, processing is performed according to the business domain.
+	// When the subscriber polling and receives a message, it takes action according to the type of the event.
 	subscriber := pubsub.NewSubscriber(butler.Sqs)
 	ctx := context.Background()
 	go subscriber.Subscribe(ctx, broker.QueueUrl)
