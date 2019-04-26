@@ -10,6 +10,15 @@ Publisher are responsible for messaging using Amazon SNS.
 
 Subscribers are responsible for polling for queuing.
 
+### Broker
+
+The broker is responsible for the topic (event) between the publisher and the subscriber.
+
+### Usecase
+
+Responsible for processing dependent on your business domain.  
+`FYI:` This has nothing to do with the concept of the Event driven architecture.
+
 ### Butler
 
 Butler does chores such as creation, destruction of SNS/SQS.  
