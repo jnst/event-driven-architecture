@@ -20,7 +20,7 @@ func NewSubscriber(svc *sqs.SQS) *Subscriber {
 	}
 }
 
-func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
+func (s *Subscriber) Subscribe(ctx context.Context, queueURL string) {
 	usecase := NewUsecase()
 
 	ticker := time.NewTicker(time.Second)
@@ -31,7 +31,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			output, err := s.svc.ReceiveMessage(&sqs.ReceiveMessageInput{QueueUrl: aws.String(queueUrl)})
+			output, err := s.svc.ReceiveMessage(&sqs.ReceiveMessageInput{QueueUrl: aws.String(queueURL)})
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -76,7 +76,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 
 				// Messages received from the queue need to be deleted at the end of processing.
 				_, err = s.svc.DeleteMessage(&sqs.DeleteMessageInput{
-					QueueUrl:      aws.String(queueUrl),
+					QueueUrl:      aws.String(queueURL),
 					ReceiptHandle: message.ReceiptHandle,
 				})
 				if err != nil {

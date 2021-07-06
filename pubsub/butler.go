@@ -55,12 +55,12 @@ func NewButlerWithLocalstack() *Butler {
 
 type PolicyDocument struct {
 	Version   string
-	Id        string
+	ID        string
 	Statement []StatementEntry
 }
 
 type StatementEntry struct {
-	Sid       string
+	SID       string
 	Effect    string
 	Principal string
 	Action    string
@@ -69,7 +69,7 @@ type StatementEntry struct {
 }
 
 type Condition struct {
-	ArnEquals map[string]string
+	ARNEquals map[string]string
 }
 
 func (b *Butler) Prepare(topicName, queueName string) Broker {
@@ -119,16 +119,16 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	// See https://docs.aws.amazon.com/ja_jp/sns/latest/dg/sns-sqs-as-subscriber.html#SendMessageToSQS.sqs.permissions
 	policy := PolicyDocument{
 		Version: "2012-10-17",
-		Id:      "MyQueuePolicy",
+		ID:      "MyQueuePolicy",
 		Statement: []StatementEntry{
 			{
-				Sid:       "MySQSPolicy001",
+				SID:       "MySQSPolicy001",
 				Effect:    "Allow",
 				Principal: "*",
 				Action:    "sqs:SendMessage",
 				Resource:  *queueAttrOutput.Attributes["QueueArn"],
 				Condition: Condition{
-					ArnEquals: map[string]string{
+					ARNEquals: map[string]string{
 						"aws:SourceArn": *topicOutput.TopicArn,
 					},
 				},
@@ -150,30 +150,30 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	}
 
 	b.broker = Broker{
-		TopicArn:        *topicOutput.TopicArn,
-		QueueUrl:        *queueOutput.QueueUrl,
-		SubscriptionArn: *subOutput.SubscriptionArn,
+		TopicARN:        *topicOutput.TopicArn,
+		QueueURL:        *queueOutput.QueueUrl,
+		SubscriptionARN: *subOutput.SubscriptionArn,
 	}
 
 	return b.broker
 }
 
 func (b *Butler) Destroy() {
-	_, err := b.Sns.Unsubscribe(&sns.UnsubscribeInput{SubscriptionArn: aws.String(b.broker.SubscriptionArn)})
+	_, err := b.Sns.Unsubscribe(&sns.UnsubscribeInput{SubscriptionArn: aws.String(b.broker.SubscriptionARN)})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Destroy subscription done.")
 
-	_, err = b.Sns.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(b.broker.TopicArn)})
+	_, err = b.Sns.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(b.broker.TopicARN)})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Destroy topic done.")
 
-	_, err = b.Sqs.DeleteQueue(&sqs.DeleteQueueInput{QueueUrl: aws.String(b.broker.QueueUrl)})
+	_, err = b.Sqs.DeleteQueue(&sqs.DeleteQueueInput{QueueUrl: aws.String(b.broker.QueueURL)})
 	if err != nil {
 		panic(err)
 	}

@@ -35,15 +35,15 @@ func main() {
 	subscriber := pubsub.NewSubscriber(butler.Sqs)
 
 	ctx := context.Background()
-	go subscriber.Subscribe(ctx, broker.QueueUrl)
+	go subscriber.Subscribe(ctx, broker.QueueURL)
 
 	// Publisher sends message to topic every 5 seconds.
 	publisher := pubsub.NewPublisher(butler.Sns)
 
 	for i := 1; i < 5; i++ {
-		userId := strconv.Itoa(i)
+		userID := strconv.Itoa(i)
 		msg := pubsub.UserEvent{
-			UserId: userId,
+			UserID: userID,
 			Status: "user.created",
 			Time:   time.Now().Unix(),
 		}
@@ -53,7 +53,7 @@ func main() {
 			panic(err)
 		}
 
-		_, _ = publisher.Publish(broker.TopicArn, string(b))
+		_, _ = publisher.Publish(broker.TopicARN, string(b))
 
 		time.Sleep(5 * time.Second)
 	}
