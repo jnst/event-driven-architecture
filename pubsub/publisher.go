@@ -25,6 +25,8 @@ func (p *Publisher) Publish(topicArn, message string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	fmt.Printf("published: %s\n", message)
+
 	return *output.MessageId, nil
 }

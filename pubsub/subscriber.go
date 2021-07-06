@@ -36,6 +36,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 				fmt.Println(err)
 				continue
 			}
+
 			if len(output.Messages) == 0 {
 				fmt.Println("received: no message")
 			} else {
@@ -43,15 +44,19 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 			}
 
 			for _, message := range output.Messages {
-
 				fmt.Println("processing:")
-				body := MessageBody{}
+
+				var (
+					body      = MessageBody{}
+					userEvent = UserEvent{}
+				)
+
 				err = json.Unmarshal([]byte(*message.Body), &body)
 				if err != nil {
 					fmt.Println(err)
 					continue
 				}
-				userEvent := UserEvent{}
+
 				err = json.Unmarshal([]byte(body.Message), &userEvent)
 				if err != nil {
 					fmt.Println(err)
@@ -78,6 +83,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, queueUrl string) {
 					fmt.Println(err)
 					continue
 				}
+
 				fmt.Printf("deleted: %s\n", *message.ReceiptHandle)
 			}
 		}

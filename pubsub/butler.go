@@ -22,6 +22,7 @@ func NewButlerWithProfile(profile string) *Butler {
 	cfg := aws.NewConfig().
 		WithCredentials(creds).
 		WithRegion("ap-northeast-1")
+
 	sess, err := session.NewSession(cfg)
 	if err != nil {
 		panic(err)
@@ -79,6 +80,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Printf("Prepare queue:\n%+v\n", queueOutput)
 
 	queueAttrOutput, err := b.Sqs.GetQueueAttributes(&sqs.GetQueueAttributesInput{
@@ -88,6 +90,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Printf("Prepare queue-attributes:\n%+v\n", queueAttrOutput)
 
 	// Pub/Sub
@@ -97,6 +100,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil { // FYI: if already topic exists, it's not occurs error.
 		panic(err)
 	}
+
 	fmt.Printf("Prepare topic:\n%+v\n", topicOutput)
 
 	subOutput, err := b.Sns.Subscribe(&sns.SubscribeInput{
@@ -108,6 +112,7 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Printf("Prepare subscription:\n%+v\n", subOutput)
 
 	// Policy for SQS
@@ -130,10 +135,12 @@ func (b *Butler) Prepare(topicName, queueName string) Broker {
 			},
 		},
 	}
+
 	buf, err := json.Marshal(&policy)
 	if err != nil {
 		panic(err)
 	}
+
 	_, err = b.Sqs.SetQueueAttributes(&sqs.SetQueueAttributesInput{
 		Attributes: map[string]*string{"Policy": aws.String(string(buf))},
 		QueueUrl:   queueOutput.QueueUrl,
@@ -156,17 +163,20 @@ func (b *Butler) Destroy() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Destroy subscription done.")
 
 	_, err = b.Sns.DeleteTopic(&sns.DeleteTopicInput{TopicArn: aws.String(b.broker.TopicArn)})
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Destroy topic done.")
 
 	_, err = b.Sqs.DeleteQueue(&sqs.DeleteQueueInput{QueueUrl: aws.String(b.broker.QueueUrl)})
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Destroy queue done.")
 }
