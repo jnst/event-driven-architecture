@@ -7,14 +7,14 @@ type Broker struct {
 }
 
 type MessageBody struct {
-	Message   string `json:"Message"`
-	Type      string `json:"Type"`
-	TopicArn  string `json:"TopicArn"`
-	MessageID string `json:"MessageId"`
+	Message   string `json:"message"`
+	Type      string `json:"type"`
+	TopicArn  string `json:"topicArn"`
+	MessageID string `json:"messageId"`
 }
 
 type UserEvent struct {
-	UserId string `json:"UserId"`
-	Status string `json:"Status"`
-	Time   int64  `json:"Time"`
+	UserId string `json:"userId"`
+	Status string `json:"status"`
+	Time   int64  `json:"time"`
 }
