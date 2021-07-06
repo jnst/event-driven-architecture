@@ -2,7 +2,7 @@ package pubsub
 
 import "fmt"
 
-type Usecase struct {}
+type Usecase struct{}
 
 func NewUsecase() *Usecase {
 	return &Usecase{}

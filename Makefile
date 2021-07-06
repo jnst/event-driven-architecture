@@ -3,6 +3,6 @@
 start:
 	go run *.go
 
-format:
+fmt:
 	gofmt -w *.go **/*.go
 	goimports -w *.go **/*.go
