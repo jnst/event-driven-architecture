@@ -36,12 +36,12 @@ func NewButlerWithProfile(profile string) *Butler {
 func NewButlerWithLocalstack() *Butler {
 	cfg := aws.NewConfig().WithRegion("ap-northeast-1")
 
-	snsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4575"))
+	snsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4566"))
 	if err != nil {
 		panic(err)
 	}
 
-	sqsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4576"))
+	sqsSess, err := session.NewSession(cfg.WithEndpoint("http://localhost:4566"))
 	if err != nil {
 		panic(err)
 	}

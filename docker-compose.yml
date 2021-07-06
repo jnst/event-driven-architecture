@@ -3,9 +3,8 @@ services:
   localstack:
     image: localstack/localstack
     ports:
-      - '8080:8080' # Web UI
-      - '4575:4575' # SNS
-      - '4576:4576' # SQS
+      - "4566:4566"
+      - "4571:4571"
     environment:
       - SERVICES=sns,sqs
       - DEFAULT_REGION=ap-northeast-1
