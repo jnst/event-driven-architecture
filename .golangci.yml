@@ -87,6 +87,9 @@ issues:
   max-same-issues: 0
 
 linters-settings:
+  funlen:
+    lines: 100
+    statements: 40
   gomnd:
     settings:
       mnd:
