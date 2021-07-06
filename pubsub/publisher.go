@@ -23,7 +23,7 @@ func (p *Publisher) Publish(topicArn, message string) (string, error) {
 		TopicArn: aws.String(topicArn),
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to sns publish: %w", err)
 	}
 
 	fmt.Printf("published: %s\n", message)
